@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bionic Reading Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+            --header-color: #2c3e50;
+            --card-bg: #fff;
+            --card-shadow: rgba(0,0,0,0.1);
+            --button-primary: #3498db;
+            --button-primary-hover: #2980b9;
+            --button-secondary: #7f8c8d;
+            --button-secondary-hover: #6c7a7d;
+            --border-color: #ddd;
+            --info-bg: #e7f5ff;
+            --info-border: #3498db;
+            --muted-text: #7f8c8d;
+            --highlight-color: #3498db;
+            --font-family: 'Inter', sans-serif;
+        }
+        
+        .dark-mode {
+            --bg-color: #121212;
+            --text-color: rgba(255, 255, 255, 0.87);
+            --header-color: #70a1ff;
+            --card-bg: #1e1e1e;
+            --card-shadow: rgba(0,0,0,0.3);
+            --button-primary: #3742fa;
+            --button-primary-hover: #2e36cf;
+            --button-secondary: #555;
+            --button-secondary-hover: #444;
+            --border-color: #333;
+            --info-bg: #2c3e50;
+            --info-border: #70a1ff;
+            --muted-text: #aaa;
+            --highlight-color: #70a1ff;
+            --font-family: 'Montserrat', sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            color: var(--header-color);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .app-description {
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--muted-text);
+        }
+        
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--card-shadow);
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: rgba(0,0,0,0.03);
+        }
+        
+        .dark-mode .control-group {
+            background-color: rgba(255,255,255,0.05);
+        }
+        
+        button {
+            padding: 12px 18px;
+            background-color: var(--button-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        button:hover {
+            background-color: var(--button-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        
+        button.secondary {
+            background-color: var(--button-secondary);
+        }
+        
+        button.secondary:hover {
+            background-color: var(--button-secondary-hover);
+        }
+        
+        label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        input[type="range"] {
+            width: 150px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--border-color);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--button-primary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        input[type="range"]:focus {
+            outline: none;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .text-areas {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        @media (min-width: 992px) {
+            .text-areas {
+                flex-direction: row;
+            }
+            
+            .text-box {
+                flex: 1;
+            }
+        }
+        
+        .text-box {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--card-shadow);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .text-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .text-box h2 {
+            color: var(--header-color);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 350px;
+            padding: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            resize: vertical;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-family: var(--font-family);
+        }
+        
+        textarea:focus {
+            outline: 2px solid var(--highlight-color);
+            border-color: transparent;
+        }
+        
+        #output-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #output {
+            height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.8;
+            color: var(--text-color);
+            flex-grow: 1;
+        }
+        
+        .dark-mode #output {
+            letter-spacing: 0.01em;
+        }
+        
+        .bionic {
+            font-weight: normal;
+            opacity: 0.95;
+        }
+        
+        .bionic-bold {
+            font-weight: 600;
+            opacity: 1;
+        }
+        
+        .dark-mode .bionic {
+            font-weight: 400;
+            opacity: 0.85;
+        }
+        
+        .dark-mode .bionic-bold {
+            font-weight: 500;
+        }
+        
+        .high-contrast .bionic {
+            opacity: 0.6;
+        }
+        
+        .high-contrast.dark-mode .bionic {
+            opacity: 0.55;
+        }
+        
+        .high-contrast .bionic-bold {
+            opacity: 1;
+        }
+        
+        .info-box {
+            background-color: var(--info-bg);
+            border-left: 4px solid var(--info-border);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: var(--muted-text);
+        }
+        
+        .word-count {
+            color: var(--muted-text);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        /* Toggle switch for dark mode */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--button-primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Fullscreen mode styles */
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            background-color: var(--bg-color);
+            padding: 0;
+            margin: 0;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .fullscreen-header {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1001;
+        }
+        
+        .fullscreen-title {
+            color: var(--header-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .fullscreen-output {
+            font-size: 18px;
+            line-height: 1.8;
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            width: 100%;
+        }
+        
+        .dark-mode .fullscreen-output {
+            font-size: 19px;
+            letter-spacing: 0.015em;
+            line-height: 1.9;
+        }
+        
+        .fullscreen-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 15px;
+            z-index: 1001;
+            transition: opacity 0.3s;
+            opacity: 0.15;
+        }
+        
+        .fullscreen-controls:hover {
+            opacity: 1;
+        }
+        
+        .font-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .font-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            padding: 0;
+        }
+        
+        /* Paragraph styling in output */
+        .paragraph {
+            margin-bottom: 1.2em;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .controls {
+                padding: 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+            
+            .fullscreen-output {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bionic Reading Converter</h1>
+            <p class="app-description">Transform your text to enhance reading speed and comprehension using the Bionic Reading format</p>
+        </header>
+
+        <div class="controls-container">
+            <div class="info-box">
+                <p>Bionic Reading highlights the initial letters of words to create fixation points, guiding your eyes through text more efficiently. Your brain recognizes these patterns and autocompletes the rest of each word, allowing for faster reading while maintaining comprehension.</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label for="fixation">Fixation:</label>
+                    <input type="range" id="fixation" min="20" max="80" value="50" step="10">
+                    <span id="fixation-value">50%</span>
+                </div>
+                
+                <div class="control-group">
+                    <label for="highContrast">High contrast:</label>
+                    <input type="checkbox" id="highContrast">
+                </div>
+                
+                <div class="control-group">
+                    <label for="darkMode">Dark mode:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="darkMode" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <button id="convert-btn">Convert to Bionic</button>
+                    <button id="clear-btn" class="secondary">Clear All</button>
+                    <button id="fullscreen-btn" class="secondary">Fullscreen</button>
+                </div>
+            </div>
+
+            <div class="text-areas">
+                <div class="text-box">
+                    <div class="text-box-header">
+                        <h2>Original Text</h2>
+                    </div>
+                    <textarea id="input" placeholder="Paste your text here (up to 50,000 words)"></textarea>
+                    <div class="word-count" id="input-count">0 words</div>
+                </div>
+                
+                <div class="text-box">
+                    <div class="text-box-header">
+                        <h2>Bionic Reading Format</h2>
+                    </div>
+                    <div id="output-container">
+                        <div id="output"></div>
+                        <div class="word-count" id="output-count">0 words</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const inputText = document.getElementById('input');
+            const outputDiv = document.getElementById('output');
+            const convertBtn = document.getElementById('convert-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const fixationSlider = document.getElementById('fixation');
+            const fixationValue = document.getElementById('fixation-value');
+            const highContrastCheck = document.getElementById('highContrast');
+            const darkModeToggle = document.getElementById('darkMode');
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const inputCount = document.getElementById('input-count');
+            const outputCount = document.getElementById('output-count');
+            
+            // Variables for app state
+            let currentFontSize = 19;
+            let isFullscreen = false;
+            let fullscreenContainer = null;
+            
+            // Check for saved preferences and load them
+            loadPreferences();
+            
+            // Update fixation value display
+            fixationSlider.addEventListener('input', function() {
+                fixationValue.textContent = this.value + '%';
+            });
+            
+            // Update word count on input
+            inputText.addEventListener('input', function() {
+                const wordCount = countWords(this.value);
+                inputCount.textContent = wordCount + ' words';
+            });
+            
+            // Toggle dark mode
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+                savePreferences();
+            });
+            
+            // Toggle high contrast
+            highContrastCheck.addEventListener('change', function() {
+                if (this.checked) {
+                    outputDiv.classList.add('high-contrast');
+                    if (fullscreenContainer) {
+                        const fsOutput = fullscreenContainer.querySelector('.fullscreen-output');
+                        if (fsOutput) fsOutput.classList.add('high-contrast');
+                    }
+                } else {
+                    outputDiv.classList.remove('high-contrast');
+                    if (fullscreenContainer) {
+                        const fsOutput = fullscreenContainer.querySelector('.fullscreen-output');
+                        if (fsOutput) fsOutput.classList.remove('high-contrast');
+                    }
+                }
+                savePreferences();
+            });
+            
+            // Convert text button click handler
+            convertBtn.addEventListener('click', function() {
+                convertText();
+            });
+            
+            // Convert text function (separated for reuse)
+            function convertText() {
+                const text = inputText.value;
+                
+                if (!text.trim()) {
+                    outputDiv.innerHTML = 'Please enter some text to convert.';
+                    return;
+                }
+                
+                // Show loading indicator for large texts
+                if (text.length > 20000) {
+                    outputDiv.innerHTML = '<div class="loading">Processing large text, please wait...</div>';
+                }
+                
+                // Use setTimeout to allow the UI to update before processing
+                setTimeout(() => {
+                    const fixation = parseInt(fixationSlider.value) / 100;
+                    const useHighContrast = highContrastCheck.checked;
+                    
+                    // Process in chunks for large texts
+                    const convertedText = convertToBionic(text, fixation);
+                    
+                    // Apply high contrast if selected
+                    outputDiv.className = useHighContrast ? 'high-contrast' : '';
+                    outputDiv.innerHTML = convertedText;
+                    
+                    // Update output word count
+                    const wordCount = countWords(text);
+                    outputCount.textContent = wordCount + ' words';
+                }, 10);
+            }
+            
+            // Clear both input and output
+            clearBtn.addEventListener('click', function() {
+                inputText.value = '';
+                outputDiv.innerHTML = '';
+                inputCount.textContent = '0 words';
+                outputCount.textContent = '0 words';
+            });
+            
+            // Fullscreen reading mode
+            fullscreenBtn.addEventListener('click', function() {
+                if (!outputDiv.innerHTML || outputDiv.innerHTML.trim() === '' || 
+                    outputDiv.innerHTML === 'Please enter some text to convert.') {
+                    alert('Please convert some text first before entering fullscreen mode.');
+                    return;
+                }
+                
+                enterFullscreenMode();
+            });
+            
+            // Enter fullscreen reading mode
+            function enterFullscreenMode() {
+                isFullscreen = true;
+                
+                // Create fullscreen container
+                fullscreenContainer = document.createElement('div');
+                fullscreenContainer.className = 'fullscreen-mode';
+                fullscreenContainer.id = 'fullscreen-container';
+                
+                // Create header
+                const header = document.createElement('div');
+                header.className = 'fullscreen-header';
+                
+                const title = document.createElement('div');
+                title.className = 'fullscreen-title';
+                title.textContent = 'Bionic Reading Format';
+                
+                const exitButton = document.createElement('button');
+                exitButton.className = 'secondary';
+                exitButton.textContent = 'Exit Fullscreen';
+                exitButton.addEventListener('click', exitFullscreenMode);
+                
+                header.appendChild(title);
+                header.appendChild(exitButton);
+                
+                // Create content
+                const content = document.createElement('div');
+                content.className = 'fullscreen-output';
+                if (highContrastCheck.checked) {
+                    content.classList.add('high-contrast');
+                }
+                content.innerHTML = outputDiv.innerHTML;
+                
+                // Create controls
+                const controls = document.createElement('div');
+                controls.className = 'fullscreen-controls';
+                
+                // Font size controls
+                const fontControl = document.createElement('div');
+                fontControl.className = 'font-control';
+                
+                const decreaseBtn = document.createElement('button');
+                decreaseBtn.className = 'font-button secondary';
+                decreaseBtn.textContent = 'A-';
+                decreaseBtn.addEventListener('click', () => {
+                    currentFontSize = Math.max(14, currentFontSize - 1);
+                    updateFullscreenFontSize();
+                });
+                
+                const fontSizeDisplay = document.createElement('span');
+                fontSizeDisplay.id = 'font-size-display';
+                fontSizeDisplay.textContent = currentFontSize + 'px';
+                
+                const increaseBtn = document.createElement('button');
+                increaseBtn.className = 'font-button secondary';
+                increaseBtn.textContent = 'A+';
+                increaseBtn.addEventListener('click', () => {
+                    currentFontSize = Math.min(32, currentFontSize + 1);
+                    updateFullscreenFontSize();
+                });
+                
+                fontControl.appendChild(decreaseBtn);
+                fontControl.appendChild(fontSizeDisplay);
+                fontControl.appendChild(increaseBtn);
+                controls.appendChild(fontControl);
+                
+                // Assemble fullscreen view
+                fullscreenContainer.appendChild(header);
+                fullscreenContainer.appendChild(content);
+                fullscreenContainer.appendChild(controls);
+                
+                // Add to document
+                document.body.appendChild(fullscreenContainer);
+                
+                // Hide normal page scroll
+                document.body.style.overflow = 'hidden';
+                
+                // Set initial font size
+                updateFullscreenFontSize();
+                
+                // Auto-show controls on mouse movement, hide after inactivity
+                let timeout;
+                fullscreenContainer.addEventListener('mousemove', () => {
+                    controls.style.opacity = '1';
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        controls.style.opacity = '0.15';
+                    }, 3000);
+                });
+            }
+            
+            // Update font size in fullscreen mode
+            function updateFullscreenFontSize() {
+                if (!fullscreenContainer) return;
+                
+                const output = fullscreenContainer.querySelector('.fullscreen-output');
+                const sizeDisplay = fullscreenContainer.querySelector('#font-size-display');
+                
+                if (output) output.style.fontSize = currentFontSize + 'px';
+                if (sizeDisplay) sizeDisplay.textContent = currentFontSize + 'px';
+            }
+            
+            // Exit fullscreen mode
+            function exitFullscreenMode() {
+                if (fullscreenContainer) {
+                    document.body.removeChild(fullscreenContainer);
+                    fullscreenContainer = null;
+                }
+                document.body.style.overflow = '';
+                isFullscreen = false;
+            }
+            
+            // Save preferences to localStorage
+            function savePreferences() {
+                const preferences = {
+                    darkMode: darkModeToggle.checked,
+                    highContrast: highContrastCheck.checked,
+                    fixation: fixationSlider.value,
+                    fontSize: currentFontSize
+                };
+                localStorage.setItem('bionicReaderPrefs', JSON.stringify(preferences));
+            }
+            
+            // Load preferences from localStorage
+            function loadPreferences() {
+                const savedPrefs = localStorage.getItem('bionicReaderPrefs');
+                if (savedPrefs) {
+                    try {
+                        const preferences = JSON.parse(savedPrefs);
+                        
+                        // Apply dark mode if saved
+                        darkModeToggle.checked = preferences.darkMode !== undefined ? preferences.darkMode : true;
+                        if (darkModeToggle.checked) {
+                            document.body.classList.add('dark-mode');
+                        }
+                        
+                        // Apply high contrast if saved
+                        highContrastCheck.checked = preferences.highContrast || false;
+                        if (highContrastCheck.checked) {
+                            outputDiv.classList.add('high-contrast');
+                        }
+                        
+                        // Apply fixation percentage if saved
+                        if (preferences.fixation) {
+                            fixationSlider.value = preferences.fixation;
+                            fixationValue.textContent = preferences.fixation + '%';
+                        }
+                        
+                        // Apply font size if saved
+                        if (preferences.fontSize) {
+                            currentFontSize = preferences.fontSize;
+                        }
+                    } catch (e) {
+                        console.error('Error loading preferences:', e);
+                    }
+                } else {
+                    // Default to dark mode if no preferences saved
+                    darkModeToggle.checked = true;
+                    document.body.classList.add('dark-mode');
+                }
+            }
+            
+            // Function to convert text to bionic reading format - WITH PARAGRAPH PRESERVATION
+            function convertToBionic(text, fixationRatio) {
+                // For very large texts, process in chunks
+                if (text.length > 100000) {
+                    return processLargeText(text, fixationRatio);
+                }
+                
+                // First, split the text into paragraphs
+                // This regex matches one or more newlines with optional whitespace in between
+                const paragraphs = text.split(/\n\s*\n|\n(?=\S)/);
+                let result = '';
+                
+                // Process each paragraph separately
+                for (let i = 0; i < paragraphs.length; i++) {
+                    const paragraph = paragraphs[i];
+                    if (!paragraph.trim()) {
+                        // Skip empty paragraphs but preserve the structure
+                        if (i < paragraphs.length - 1) {
+                            result += '<div class="paragraph"></div>';
+                        }
+                        continue;
+                    }
+                    
+                    // Handle single line breaks within paragraphs
+                    const lines = paragraph.split(/\n/);
+                    let processedParagraph = '';
+                    
+                    for (let j = 0; j < lines.length; j++) {
+                        const line = lines[j];
+                        if (!line.trim()) {
+                            // Skip empty lines but preserve line structure
+                            processedParagraph += '<br>';
+                            continue;
+                        }
+                        
+                        // Split line into words and spaces
+                        const words = line.split(/(\s+)/);
+                        let processedLine = '';
+                        
+                        for (const part of words) {
+                            if (part.trim() === '') {
+                                // Preserve whitespace
+                                processedLine += part;
+                            } else {
+                                // Process word
+                                const wordLength = part.length;
+                                const fixationLength = Math.max(1, Math.ceil(wordLength * fixationRatio));
+                                
+                                // Split the word into the part to bold and the rest
+                                const boldPart = part.substring(0, fixationLength);
+                                const restPart = part.substring(fixationLength);
+                                
+                                // Add the word with the first part bolded
+                                processedLine += '<span class="bionic-bold">' + boldPart + '</span>';
+                                if (restPart) {
+                                    processedLine += '<span class="bionic">' + restPart + '</span>';
+                                }
+                            }
+                        }
+                        
+                        // Add the processed line
+                        processedParagraph += processedLine;
+                        
+                        // Add line break except after the last line
+                        if (j < lines.length - 1) {
+                            processedParagraph += '<br>';
+                        }
+                    }
+                    
+                    // Wrap the paragraph in a div for proper spacing
+                    result += '<div class="paragraph">' + processedParagraph + '</div>';
+                }
+                
+                return result;
+            }
+            
+            // Process large text in chunks to prevent UI freezing - WITH PARAGRAPH PRESERVATION
+            function processLargeText(text, fixationRatio) {
+                // First split into paragraphs
+                const paragraphs = text.split(/\n\s*\n|\n(?=\S)/);
+                let result = '';
+                
+                for (let i = 0; i < paragraphs.length; i++) {
+                    const paragraph = paragraphs[i];
+                    
+                    if (!paragraph.trim()) {
+                        // Skip empty paragraphs but preserve the structure
+                        if (i < paragraphs.length - 1) {
+                            result += '<div class="paragraph"></div>';
+                        }
+                        continue;
+                    }
+                    
+                    // Handle single line breaks within paragraphs
+                    const lines = paragraph.split(/\n/);
+                    let processedParagraph = '';
+                    
+                    for (let j = 0; j < lines.length; j++) {
+                        const line = lines[j];
+                        if (!line.trim()) {
+                            // Skip empty lines but preserve line structure
+                            processedParagraph += '<br>';
+                            continue;
+                        }
+                        
+                        // Process each line with the chunk method if it's very large
+                        if (line.length > 10000) {
+                            const processedLine = processLargeLine(line, fixationRatio);
+                            processedParagraph += processedLine;
+                        } else {
+                            // Process smaller lines directly
+                            const words = line.split(/(\s+)/);
+                            let processedLine = '';
+                            
+                            for (const part of words) {
+                                if (part.trim() === '') {
+                                    processedLine += part;
+                                } else {
+                                    const wordLength = part.length;
+                                    const fixationLength = Math.max(1, Math.ceil(wordLength * fixationRatio));
+                                    const boldPart = part.substring(0, fixationLength);
+                                    const restPart = part.substring(fixationLength);
+                                    processedLine += '<span class="bionic-bold">' + boldPart + '</span>';
+                                    if (restPart) {
+                                        processedLine += '<span class="bionic">' + restPart + '</span>';
+                                    }
+                                }
+                            }
+                            
+                            processedParagraph += processedLine;
+                        }
+                        
+                        // Add line break except after the last line
+                        if (j < lines.length - 1) {
+                            processedParagraph += '<br>';
+                        }
+                    }
+                    
+                    // Wrap the paragraph in a div for proper spacing
+                    result += '<div class="paragraph">' + processedParagraph + '</div>';
+                }
+                
+                return result;
+            }
+            
+            // Helper function for processing very large lines in chunks
+            function processLargeLine(line, fixationRatio) {
+                const chunkSize = 10000;
+                const totalChunks = Math.ceil(line.length / chunkSize);
+                let result = '';
+                
+                for (let i = 0; i < totalChunks; i++) {
+                    const start = i * chunkSize;
+                    const end = Math.min(start + chunkSize, line.length);
+                    const chunk = line.substring(start, end);
+                    
+                    // Find word boundaries
+                    let chunkStart = 0;
+                    let chunkEnd = chunk.length;
+                    
+                    // If not the first chunk, find the first space
+                    if (i > 0) {
+                        const firstSpaceIndex = chunk.indexOf(' ');
+                        if (firstSpaceIndex > 0) {
+                            chunkStart = firstSpaceIndex + 1;
+                        }
+                    }
+                    
+                    // If not the last chunk, find the last space
+                    if (i < totalChunks - 1) {
+                        const lastSpaceIndex = chunk.lastIndexOf(' ');
+                        if (lastSpaceIndex > 0) {
+                            chunkEnd = lastSpaceIndex;
+                        }
+                    }
+                    
+                    // Process this chunk
+                    const words = chunk.substring(chunkStart, chunkEnd).split(/(\s+)/);
+                    let processedChunk = '';
+                    
+                    for (const part of words) {
+                        if (part.trim() === '') {
+                            processedChunk += part;
+                        } else {
+                            const wordLength = part.length;
+                            const fixationLength = Math.max(1, Math.ceil(wordLength * fixationRatio));
+                            const boldPart = part.substring(0, fixationLength);
+                            const restPart = part.substring(fixationLength);
+                            processedChunk += '<span class="bionic-bold">' + boldPart + '</span>';
+                            if (restPart) {
+                                processedChunk += '<span class="bionic">' + restPart + '</span>';
+                            }
+                        }
+                    }
+                    
+                    result += processedChunk;
+                }
+                
+                return result;
+            }
+            
+            // Count words in text
+            function countWords(text) {
+                return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            }
+            
+            // Handle keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Escape key exits fullscreen
+                if (e.key === 'Escape' && isFullscreen) {
+                    exitFullscreenMode();
+                }
+                
+                // Ctrl+Enter to convert text
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    convertText();
+                }
+                
+                // F11 to toggle fullscreen
+                if (e.key === 'F11' && outputDiv.innerHTML.trim() !== '') {
+                    e.preventDefault();
+                    if (isFullscreen) {
+                        exitFullscreenMode();
+                    } else {
+                        enterFullscreenMode();
+                    }
+                }
+            });
+            
+            // Save preferences when changing settings
+            fixationSlider.addEventListener('change', savePreferences);
+        });
+    </script>
+</body>
+</html>
