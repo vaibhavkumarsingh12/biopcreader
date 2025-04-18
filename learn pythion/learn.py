@@ -9,4 +9,3 @@ for i in range(100):
 
 for i in range(99,0,-1):
   print(f"{i} bottles of bear on the wall
-          {i} bottles of beer" )
